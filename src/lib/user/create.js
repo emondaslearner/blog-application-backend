@@ -9,7 +9,7 @@ const { generateHash } = require("../../utils/hashing");
  */
 
 const createUser = async ({ name, email, password, role = 'user', status = 'pending' }) => {
-  if (!name || !email || !password) new error.badRequest("Invalid information");
+  if (!name || !email || !password) throw error.badRequest("Invalid information");
   
   // hash password
   const hashPassword = await generateHash(password);

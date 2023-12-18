@@ -1,3 +1,4 @@
+const { error } = require("../../utils");
 const { generateToken } = require("../token");
 const { createUser } = require("../user");
 
@@ -13,7 +14,9 @@ const { createUser } = require("../user");
  * @throws {Error} If there is an issue with the signup process.
  */
 const signup = async ({ name, email, password }) => {
-  if (!name || !email || !password) new error.badRequest("Invalid information");
+  console.log('Hello world');
+  if (!name || !email || !password) throw error.badRequest("Invalid information");
+  console.log('Hello world 2');
 
   const userData = await createUser({
     name,

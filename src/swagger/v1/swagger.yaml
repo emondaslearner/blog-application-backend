@@ -559,7 +559,7 @@ paths:
                     type: string
                     example: "Comment created successfully"
                   data:
-                    $ref: "#/comments/schemas/comment"
+                    $ref: "#/components/schemas/comment"
                   self:
                     type: string
                     example: "/comments"
@@ -605,7 +605,7 @@ paths:
                     example: "Fetched comments successfully"
                   data:
                     allOf:
-                      - $ref: "#/comments/schemas/comment"
+                      - $ref: "#/components/schemas/comment"
                       - type: object
                         properties:
                           user:
@@ -652,7 +652,7 @@ paths:
                     example: "Fetched comments successfully"
                   data:
                     allOf:
-                      - $ref: "#/comments/schemas/comment"
+                      - $ref: "#/components/schemas/comment"
                       - type: object
                         properties:
                           user:
