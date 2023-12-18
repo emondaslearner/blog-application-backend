@@ -1,0 +1,1452 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: "Blog application"
+  description: "This is a blog application where you can read many type of blogs"
+servers:
+  - description: "dev"
+    url: "http://localhost:5000/api/v1"
+tags:
+  - name: "auth"
+    description: "Authentication"
+  - name: "article"
+    description: "Articles"
+  - name: "comment"
+    description: "Comments"
+  - name: "user"
+    description: "Users"
+paths:
+  /auth/sign-in:
+    post:
+      tags:
+        - auth
+      description: "Api for sign in to application"
+      operationId: "signIn"
+      requestBody:
+        description: "Provide information to login into application"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+              required:
+                - email
+                - password
+      responses:
+        200:
+          description: "Successfully logged in"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 400
+                  data:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                  self:
+                    type: string
+                    example: "/auth/sign-in"
+                  links:
+                    type: object
+                    properties:
+                      articles:
+                        type: string
+                        example: "/articles?sortType=des&sortBy=updatedAt&limit=100&page=1&expand=comment"
+                      user:
+                        type: string
+                        example: "/user/:id"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /auth/sign-up:
+    post:
+      tags:
+        - auth
+      description: "Sign up for continue with the application"
+      parameters:
+        - in: formData
+          name: profile_picture
+          type: file
+          description: "Upload profile picture"
+      requestBody:
+        description: "Pass those details to signup"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Jone deo"
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+              required:
+                - name
+                - email
+                - password
+      responses:
+        201:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 201
+                  message:
+                    type: string
+                    example: "Successfully created account"
+                  data:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                  self:
+                    type: string
+                    example: "/auth/sign-up"
+                  links:
+                    type: object
+                    properties:
+                      articles:
+                        type: string
+                        example: "/articles?sortType=des&sortBy=updatedAt&limit=100&page=1&expand=comment"
+                      user:
+                        type: string
+                        example: "/user/:id"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /articles:
+    post:
+      description: "Create article"
+      tags:
+        - article
+      operationId: "CreateArticle"
+      requestBody:
+        description: "Provide details to create post"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Article title"
+                content:
+                  type: string
+                  example: "Article content"
+      parameters:
+        - in: formData
+          type: file
+          name: cover_photo
+          description: "Cover photo of the blog"
+      responses:
+        201:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 201
+                  message:
+                    type: string
+                    example: "Successfully created post"
+                  data:
+                    $ref: "#/components/schemas/article"
+                  self:
+                    type: string
+                    example: "/articles"
+                  links:
+                    type: object
+                    properties:
+                      createdPost:
+                        type: string
+                        example: "/article/5874"
+                      comments:
+                        type: string
+                        example: "/comment/5874"
+        400:
+          $ref: "#/components/responses/400"
+        401:
+          $ref: "#/components/responses/401"
+        500:
+          $ref: "#/components/responses/500"
+    get:
+      description: "Get blogs"
+      tags:
+        - article
+      operationId: getBlogs
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/sortType"
+        - $ref: "#/components/parameters/sortBy"
+        - $ref: "#/components/parameters/search"
+        - in: query
+          name: expand
+          description: "If you want to get extra details with every post then pass expand"
+          schema:
+            type: string
+            enum:
+              - comments
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "Data fetched successfully"
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/article"
+                        - type: object
+                          properties:
+                            comments:
+                              type: array
+                              items:
+                                $ref: "#/components/schemas/comment"
+                        - type: object
+                          properties:
+                            user:
+                              $ref: "#/components/schemas/user"
+                  self:
+                    type: string
+                    example: "/articles?page=4&limit=10&sortType=dsc&sortBy=updatedAt"
+                  links:
+                    type: object
+                    properties:
+                      nxtPage:
+                        type: string
+                        example: "/articles?page=5&limit=10&sortType=dsc&sortBy=updatedAt"
+                      prvPage:
+                        type: string
+                        example: "/articles?page=3&limit=10&sortType=dsc&sortBy=updatedAt"
+                  pagination:
+                    $ref: "#/components/schemas/pagination"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /article/{id}:
+    get:
+      description: "Get Single post"
+      tags:
+        - article
+      operationId: "GetSinglePost"
+      parameters:
+        - $ref: "#/components/parameters/pathId"
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "Post fetched successfully"
+                  data:
+                    allOf:
+                      - $ref: "#/components/schemas/article"
+                      - type: object
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/user"
+                      - type: object
+                        properties:
+                          comments:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/comment"
+                  self:
+                    type: string
+                    example: "/article/546"
+                  links:
+                    type: object
+                    properties:
+                      user:
+                        type: string
+                        example: "/user/5487"
+                      comment:
+                        type: string
+                        example: "/article/546"
+        404:
+          $ref: "#/components/responses/404"
+        500:
+          $ref: "#/components/responses/500"
+    delete:
+      description: "Delete post"
+      tags:
+        - article
+      operationId: "DeletePost"
+      parameters:
+        - $ref: "#/components/parameters/pathId"
+      responses:
+        204:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 204
+                  message:
+                    type: string
+                    example: "Successfully deleted the post"
+                  self:
+                    type: string
+                    example: "/article/5847"
+                  links:
+                    type: object
+                    properties:
+                      posts:
+                        type: string
+                        example: "/user/456/articles?page=1&limit=10&sortType=dsc&sortBy=updatedAt"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          $ref: "#/components/responses/404"
+        401:
+          $ref: "#/components/responses/401"
+        500:
+          $ref: "#/components/responses/500"
+    put:
+      description: "Update post"
+      tags:
+        - article
+      operationId: "updatePost"
+      parameters:
+        - $ref: "#/components/parameters/pathId"
+        - in: formData
+          type: file
+          name: cover_photo
+          description: "Cover photo of the blog"
+      requestBody:
+        description: "Pass information for update the post"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Updated title"
+                content:
+                  type: string
+                  example: "Updated Content"
+                status:
+                  type: string
+                  example: "approved"
+              required:
+                - title
+                - content
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "Post updated successfully"
+                  data:
+                    $ref: "#/components/schemas/article"
+                  self:
+                    type: string
+                    example: "/article/5847"
+                  links:
+                    type: object
+                    properties:
+                      post:
+                        type: string
+                        example: "/article/5847"
+                      comments:
+                        type: string
+                        example: "/article/5847/comments"
+        400:
+          $ref: "#/components/responses/400"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+    patch:
+      description: "Update post"
+      tags:
+        - article
+      operationId: "updatePostPatch"
+      parameters:
+        - $ref: "#/components/parameters/pathId"
+        - in: formData
+          type: file
+          name: cover_photo
+          description: "Cover photo of the blog"
+      requestBody:
+        description: "Pass information for update the post"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Updated title"
+                content:
+                  type: string
+                  example: "Updated Content"
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "Post updated successfully"
+                  data:
+                    $ref: "#/components/schemas/article"
+                  self:
+                    type: string
+                    example: "/article/5847"
+                  links:
+                    type: object
+                    properties:
+                      post:
+                        type: string
+                        example: "/article/5847"
+                      comments:
+                        type: string
+                        example: "/article/5847/comments"
+        400:
+          $ref: "#/components/responses/400"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          $ref: "#/components/responses/404"
+        500:
+          $ref: "#/components/responses/500"
+  /article/{id}/comments:
+    get:
+      description: "Get article comments"
+      tags:
+        - article
+      operationId: GetArticleComments
+      parameters:
+        - $ref: "#/components/parameters/pathId"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/sortType"
+        - $ref: "#/components/parameters/sortBy"
+        - $ref: "#/components/parameters/search"
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "Successfully fetched comments of article"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/article"
+                  self:
+                    type: string
+                    example: "/article/5847/comments"
+                  links:
+                    type: object
+                    properties:
+                      article:
+                        type: string
+                        example: "/article/5487"
+                      articles:
+                        type: string
+                        example: "/articles"
+                  pagination:
+                    $ref: "#/components/schemas/pagination"
+        400:
+          $ref: "#/components/responses/400"
+        404:
+          $ref: "#/components/responses/404"
+        500:
+          $ref: "#/components/responses/500"
+  /comments:
+    post:
+      description: "Create Comment"
+      tags:
+        - comment
+      operationId: "CreateComment"
+      requestBody:
+        description: "You have to pass those field to do comment on a post"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                  example: "Nice"
+      responses:
+        201:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 201
+                  message:
+                    type: string
+                    example: "Comment created successfully"
+                  data:
+                    $ref: "#/comments/schemas/comment"
+                  self:
+                    type: string
+                    example: "/comments"
+                  links:
+                    type: object
+                    properties:
+                      post:
+                        type: string
+                        example: "/article/5847"
+                      comments:
+                        type: string
+                        example: "/article/5847/comments"
+        400:
+          $ref: "#/components/responses/400"
+        401:
+          $ref: "#/components/responses/401"
+        500:
+          $ref: "#/components/responses/500"
+    get:
+      description: "Get all comments"
+      tags:
+        - comment
+      operationId: GetAllComments
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/sortType"
+        - $ref: "#/components/parameters/sortBy"
+        - $ref: "#/components/parameters/search"
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "Fetched comments successfully"
+                  data:
+                    allOf:
+                      - $ref: "#/comments/schemas/comment"
+                      - type: object
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/user"
+                  self:
+                    type: string
+                    example: "/comments?page=2&limit=10&sortType=dsc&sortBy=updatedAt"
+                  links:
+                    type: object
+                    properties:
+                      nxtPage:
+                        type: string
+                        example: "/comments?page=3&limit=10&sortType=dsc&sortBy=updatedAt"
+                      prvPage:
+                        type: string
+                        example: "/comments?page=1&limit=10&sortType=dsc&sortBy=updatedAt"
+                  pagination:
+                    $ref: "#/components/schemas/pagination"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /comment/{id}:
+    get:
+      description: "Get single comment"
+      tags:
+        - comment
+      operationId: "GetSingleComment"
+      parameters:
+        - $ref: "#/components/parameters/pathId"
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "Fetched comments successfully"
+                  data:
+                    allOf:
+                      - $ref: "#/comments/schemas/comment"
+                      - type: object
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/user"
+                  self:
+                    type: string
+                    example: "/comment/548"
+                  links:
+                    type: object
+                    properties:
+                      article:
+                        type: string
+                        example: "/article/589"
+                      user:
+                        type: string
+                        example: "/user/598"
+        404:
+          $ref: "#/components/responses/404"
+        500:
+          $ref: "#/components/responses/500"
+    delete:
+      description: "Delete comment"
+      tags:
+        - comment
+      operationId: DeleteComment
+      parameters:
+        - $ref: "#/components/parameters/pathId"
+      responses:
+        204:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 204
+                  message:
+                    type: string
+                    example: "Comment deleted successfully"
+                  self:
+                    type: string
+                    example: "/comment/548"
+                  links:
+                    type: object
+                    properties:
+                      comments:
+                        type: string
+                        example: "/article/589/comments"
+                      article:
+                        type: string
+                        example: "/article/589"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          $ref: "#/components/responses/404"
+        500:
+          $ref: "#/components/responses/500"
+    patch:
+      description: "Update comment"
+      tags:
+        - comment
+      operationId: updateComment
+      parameters:
+        - $ref: "#/components/parameters/pathId"
+      requestBody:
+        description: "Pass body to update comment"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                  example: "This post is awesome"
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "Comment updated successfully"
+                  data:
+                    $ref: "#/components/schemas/comment"
+                    self:
+                      type: string
+                      example: "/comment/548"
+                    links:
+                      type: object
+                      properties:
+                        updatedComment:
+                          type: string
+                          example: "/comment/548"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        400:
+          $ref: "#/components/responses/400"
+        404:
+          $ref: "#/components/responses/404"
+        500:
+          $ref: "#/components/responses/500"
+  /users:
+    post:
+      tags:
+        - user
+      description: "Create user"
+      operationId: CreateUser
+      parameters:
+        - in: formData
+          name: profile_picture
+          type: file
+          description: "Upload profile picture"
+      requestBody:
+        description: "Pass those details to create user"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Jone deo"
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                status:
+                  type: string
+                  example: "pending,approved,disabled,rejected,deleted"
+                role:
+                  type: string
+                  example: "user,admin,supper_admin"
+              required:
+                - name
+                - email
+                - password
+      responses:
+        201:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 201
+                  message:
+                    type: string
+                    example: "Successfully created user account"
+                  data:
+                    allOf:
+                      - $ref: "#/components/schemas/user"
+                      - type: object
+                        properties:
+                          role:
+                            type: string
+                            example: user
+                      - $ref: "#/components/schemas/timestamp"
+                  self:
+                    type: string
+                    example: "/users"
+                  links:
+                    type: object
+                    properties:
+                      users:
+                        type: string
+                        example: "/users?page=1&limit=10&sortType=dsc&sortBy=updatedAt"
+        400:
+          $ref: "#/components/responses/400"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+    get:
+      description: "Get All User"
+      tags:
+        - user
+      operationId: "GetAllUser"
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/sortType"
+        - $ref: "#/components/parameters/sortBy"
+        - $ref: "#/components/parameters/search"
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "Successfully fetched user data"
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/user"
+                        - type: object
+                          properties:
+                            role:
+                              type: string
+                              example: user
+                        - $ref: "#/components/schemas/timestamp"
+                  self:
+                    type: string
+                    example: "/users?page=2&limit=10&sortType=dsc&sortBy=updatedAt"
+                  links:
+                    type: object
+                    properties:
+                      nxtPage:
+                        type: string
+                        example: "/users?page=3&limit=10&sortType=dsc&sortBy=updatedAt"
+                      prvPage:
+                        type: string
+                        example: "/users?page=1&limit=10&sortType=dsc&sortBy=updatedAt"
+                  pagination:
+                    $ref: "#/components/schemas/pagination"
+        400:
+          $ref: "#/components/responses/400"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+    patch:
+      tags:
+        - user
+      description: "Update user"
+      operationId: UpdateUserPatch
+      parameters:
+        - in: formData
+          name: profile_picture
+          type: file
+          description: "Upload profile picture"
+      requestBody:
+        description: "Pass those details to update user"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Jone deo"
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 201
+                  message:
+                    type: string
+                    example: "Successfully updated user account"
+                  data:
+                    allOf:
+                      - $ref: "#/components/schemas/user"
+                      - type: object
+                        properties:
+                          role:
+                            type: string
+                            example: user
+                      - $ref: "#/components/schemas/timestamp"
+                  self:
+                    type: string
+                    example: "/users"
+                  links:
+                    type: object
+                    properties:
+                      updatedUser:
+                        type: string
+                        example: "/user/5487"
+                      userArticles:
+                        type: string
+                        example: "/user/5487/articles"
+        400:
+          $ref: "#/components/responses/400"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+    delete:
+      description: "Delete User"
+      tags:
+        - user
+      operationId: DeleteUserAccount
+      responses:
+        204:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 204
+                  message:
+                    type: string
+                    example: "Successfully deleted your account"
+                  self:
+                    type: string
+                    example: "/users"
+                  links:
+                    type: object
+                    properties:
+                      articles:
+                        type: string
+                        example: "/articles"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+  /user/{id}:
+    get:
+      description: "Get single user"
+      tags:
+        - user
+      operationId: GetSingleUser
+      parameters:
+        - $ref: "#/components/parameters/pathId"
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "Successfully fetched user data"
+                  data:
+                    allOf:
+                      - $ref: "#/components/schemas/user"
+                      - type: object
+                        properties:
+                          role:
+                            type: string
+                            example: user
+                      - $ref: "#/components/schemas/timestamp"
+                  self:
+                    type: string
+                    example: "/user/585"
+                  links:
+                    type: object
+                    properties:
+                      articles:
+                        type: string
+                        example: "/user/585/articles?page=1&limit=10&sortType=dsc&sortBy=updatedAt"
+        404:
+          $ref: "#/components/responses/404"
+        401:
+          $ref: "#/components/responses/401"
+        500:
+          $ref: "#/components/responses/500"
+    put:
+      tags:
+        - user
+      description: "Update user"
+      operationId: UpdateUser
+      parameters:
+        - in: formData
+          name: profile_picture
+          type: file
+          description: "Upload profile picture"
+        - $ref: "#/components/parameters/pathId"
+      requestBody:
+        description: "Pass those details to update user"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Jone deo"
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                status:
+                  type: string
+                  enum:
+                    - pending
+                    - approved
+                    - disabled
+                    - rejected
+                    - deleted
+                role:
+                  type: string
+                  enum:
+                    - user
+                    - admin
+                    - supper_admin
+              required:
+                - name
+                - email
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 201
+                  message:
+                    type: string
+                    example: "Successfully updated user account"
+                  data:
+                    allOf:
+                      - $ref: "#/components/schemas/user"
+                      - type: object
+                        properties:
+                          role:
+                            type: string
+                            example: user
+                      - $ref: "#/components/schemas/timestamp"
+                  self:
+                    type: string
+                    example: "/user/585"
+                  links:
+                    type: object
+                    properties:
+                      userData:
+                        type: string
+                        example: "/user/585"
+        400:
+          $ref: "#/components/responses/400"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+    delete:
+      description: "Delete User"
+      tags:
+        - user
+      operationId: DeleteUser
+      parameters:
+        - $ref: "#/components/parameters/pathId"
+      responses:
+        204:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 204
+                  message:
+                    type: string
+                    example: "User delete successfully"
+                  self:
+                    type: string
+                    example: "/user/585"
+                  links:
+                    type: object
+                    properties:
+                      users:
+                        type: string
+                        example: "/users"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+  /user/{id}/articles:
+    get:
+      description: "Get blogs"
+      tags:
+        - user
+      operationId: getUserBlog
+      parameters:
+        - $ref: "#/components/parameters/pathId"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/sortType"
+        - $ref: "#/components/parameters/sortBy"
+        - $ref: "#/components/parameters/search"
+        - in: query
+          name: expand
+          schema:
+            type: string
+          example: "comment"
+      responses:
+        200:
+          description: "Success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "Data fetched successfully"
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/article"
+                        - type: object
+                          properties:
+                            comments:
+                              type: array
+                              items:
+                                $ref: "#/components/schemas/comment"
+                  self:
+                    type: string
+                    example: "/user/456/articles?page=4&limit=10&sortType=dsc&sortBy=updatedAt"
+                  links:
+                    type: object
+                    properties:
+                      nxtPage:
+                        type: string
+                        example: "/user/456/articles?page=5&limit=10&sortType=dsc&sortBy=updatedAt"
+                      prvPage:
+                        type: string
+                        example: "/user/456/articles?page=3&limit=10&sortType=dsc&sortBy=updatedAt"
+                  pagination:
+                    $ref: "#/components/schemas/pagination"
+        400:
+          $ref: "#/components/responses/400"
+        401:
+          $ref: "#/components/responses/401"
+        404:
+          $ref: "#/components/responses/404"
+        500:
+          $ref: "#/components/responses/500"
+components:
+  responses:
+    400:
+      description: "Bad request"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 400
+              error:
+                type: string
+                example: "Bad request"
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    field:
+                      type: string
+                      example: email
+                    message:
+                      type: string
+                      example: "Invalid email"
+    500:
+      description: "Server error"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 500
+              error:
+                type: string
+                example: "Server error"
+              message:
+                type: string
+                example: "Server is unable to give response. please try again later"
+    401:
+      description: "Unauthorized"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 401
+              error:
+                type: string
+                example: "Unauthorized"
+              message:
+                type: string
+                example: "Please provide a valid authentication token."
+    403:
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 401
+              error:
+                type: string
+                example: "Forbidden"
+              message:
+                type: string
+                example: "You do not have correct access of this resource"
+    404:
+      description: "Not found"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 204
+              error:
+                type: string
+                example: "Not found"
+              message:
+                type: string
+                example: "Resource not found"
+  schemas:
+    article:
+      properties:
+        id:
+          type: number
+          example: 12
+        userId:
+          type: number
+          example: 25
+        coverPhoto:
+          type: string
+          example: "https://blog.com/asdfasdfasdf"
+        title:
+          type: string
+          example: "Article title"
+        content:
+          type: string
+          example: "Article content"
+        status:
+          type: string
+          example: "waiting for approval"
+        createdAt:
+          type: string
+          format: date
+        updatedAt:
+          type: string
+          format: date
+    comment:
+      properties:
+        id:
+          type: number
+          example: 25
+        body:
+          type: string
+          example: "Nice"
+        createdAt:
+          type: string
+          format: date
+        updatedAt:
+          type: string
+          format: date
+    user:
+      properties:
+        id:
+          type: number
+          example: 20
+        name:
+          type: string
+          example: "Jone Deo"
+        email:
+          type: string
+          format: email
+        profile_picture:
+          type: string
+          format: url
+    timestamp:
+      properties:
+        createdAt:
+          type: string
+          format: date
+        updatedAt:
+          type: string
+          format: date
+    pagination:
+      properties:
+        page:
+          type: number
+          example: 5
+        limit:
+          type: number
+          example: 10
+        prvPage:
+          type: number
+          example: 4
+        nxtPage:
+          type: number
+          example: 6
+        totalPage:
+          type: number
+          example: 10
+        totalResource:
+          type: number
+          example: 100
+  parameters:
+    page:
+      in: query
+      type: number
+      name: page
+      default: 0
+      description: "Which page you want to load"
+    limit:
+      in: query
+      type: number
+      name: limit
+      default: 10
+      description: "How many blog you want to get at a time"
+    sortType:
+      in: query
+      name: sortType
+      schema:
+        type: string
+        enum:
+          - asc
+          - dsc
+      default: dsc
+      description: "How you want to sort asc or dsc"
+    sortBy:
+      in: query
+      name: sortBy
+      description: "Which field you want to use for sorting"
+      type: string
+      default: "updatedAt"
+    search:
+      in: query
+      name: search
+      description: "Search"
+      type: string
+    pathId:
+      in: path
+      name: id
+      schema:
+        type: number
+      default: 1
+      required: true
+      description: "Pass resource id"
