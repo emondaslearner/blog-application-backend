@@ -1,3 +1,4 @@
 const createUser = require("./create");
+const findUserById = require("./findById");
 
-module.exports = { createUser };
+module.exports = { createUser, findUserById };

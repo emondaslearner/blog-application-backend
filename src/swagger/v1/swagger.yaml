@@ -143,6 +143,8 @@ paths:
       tags:
         - article
       operationId: "CreateArticle"
+      security:
+        - bearerAuth: []
       requestBody:
         description: "Provide details to create post"
         content:
@@ -1236,6 +1238,11 @@ paths:
         500:
           $ref: "#/components/responses/500"
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   responses:
     400:
       description: "Bad request"
@@ -1331,7 +1338,7 @@ components:
         id:
           type: number
           example: 12
-        userId:
+        author:
           type: number
           example: 25
         coverPhoto:

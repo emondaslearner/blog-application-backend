@@ -1,14 +1,15 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const swaggerUi = require('swagger-ui-express');
-const YAML = require('yamljs');
-const path = require('path');
-const router = require('../routes');
-const OpenApiValidator = require('express-openapi-validator');
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+const path = require("path");
+const router = require("../routes");
+const OpenApiValidator = require("express-openapi-validator");
+const cookieParser = require("cookie-parser");
 
 const swaggerDocument = YAML.load(
-  path.join(__dirname, '../swagger', 'v1', 'swagger.yaml')
+  path.join(__dirname, "../swagger", "v1", "swagger.yaml")
 );
 
 const middlewares = (app) => {
@@ -20,7 +21,8 @@ const middlewares = (app) => {
   //     apiSpec: path.join(__dirname, '../swagger', 'v1', 'swagger.yaml'),
   //   })
   // );
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  app.use(cookieParser());
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   app.use(router);
 };
 
