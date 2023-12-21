@@ -236,10 +236,9 @@ paths:
                         - $ref: "#/components/schemas/article"
                         - type: object
                           properties:
-                            comments:
-                              type: array
-                              items:
-                                $ref: "#/components/schemas/comment"
+                            link:
+                              type: string
+                              example: /articles/356a65s4df
                         - type: object
                           properties:
                             user:
@@ -1420,7 +1419,7 @@ components:
       in: query
       type: number
       name: page
-      default: 0
+      default: 1
       description: "Which page you want to load"
     limit:
       in: query
