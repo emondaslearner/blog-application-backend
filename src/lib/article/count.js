@@ -7,12 +7,12 @@ const { Article } = require("../../model");
  * @param {string} options.search - Search string to filter articles by title.
  * @returns {number} - Number of articles that match the search criteria.
  */
-const countArticles = ({search = ''}) => {
+const countArticles = async ({search = ''}) => {
     const filter = {
         title: { $regex: search, $options: "i" },
       };
 
-    return Article.countDocuments(filter);
+    return await Article.countDocuments(filter);
 }
 
 module.exports = countArticles;

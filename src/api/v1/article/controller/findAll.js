@@ -4,6 +4,15 @@ const {
 } = require("../../../../lib/article");
 const { query } = require("../../../../utils");
 
+/**
+ * Retrieve a paginated list of articles based on query parameters.
+ *
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next function.
+ * @throws {Error} - Throws an error if there is an issue during data retrieval.
+ * @returns {void}
+ */
 const findAll = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;

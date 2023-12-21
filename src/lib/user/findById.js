@@ -13,6 +13,9 @@ const findById = async (id) => {
   if (!id) throw error.badRequest("Id Not Provided");
 
   const user = await User.findById(id);
+  
+  if (!user) throw error.notFound();
+
   return user;
 };
 

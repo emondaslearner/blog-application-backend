@@ -208,13 +208,6 @@ paths:
         - $ref: "#/components/parameters/sortType"
         - $ref: "#/components/parameters/sortBy"
         - $ref: "#/components/parameters/search"
-        - in: query
-          name: expand
-          description: "If you want to get extra details with every post then pass expand"
-          schema:
-            type: string
-            enum:
-              - comments
       responses:
         200:
           description: "Success message"
@@ -241,7 +234,7 @@ paths:
                               example: /articles/356a65s4df
                         - type: object
                           properties:
-                            user:
+                            author:
                               $ref: "#/components/schemas/user"
                   self:
                     type: string
@@ -288,14 +281,8 @@ paths:
                       - $ref: "#/components/schemas/article"
                       - type: object
                         properties:
-                          user:
+                          author:
                             $ref: "#/components/schemas/user"
-                      - type: object
-                        properties:
-                          comments:
-                            type: array
-                            items:
-                              $ref: "#/components/schemas/comment"
                   self:
                     type: string
                     example: "/article/546"
@@ -307,7 +294,7 @@ paths:
                         example: "/user/5487"
                       comment:
                         type: string
-                        example: "/article/546"
+                        example: "/article/546/comments"
         404:
           $ref: "#/components/responses/404"
         500:
@@ -1452,7 +1439,7 @@ components:
       in: path
       name: id
       schema:
-        type: number
-      default: 1
+        type: string
+      default: '1'
       required: true
       description: "Pass resource id"

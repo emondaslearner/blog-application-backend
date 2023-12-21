@@ -1,5 +1,5 @@
 
-const notFound = (message = 'Request Not Cound') => {
+const notFound = (message = 'Resource Not Found') => {
     const error = new Error(message);
     error.status = 404;
     return error;
