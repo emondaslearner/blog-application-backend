@@ -28,7 +28,6 @@ const findAll = async (req, res, next) => {
 
     // pagination
     const totalArticle = await countArticles({ search: search });
-    console.log("totalArticletotalArticletotalArticle", totalArticle);
     const pagination = await query.getPagination({
       totalItems: totalArticle,
       limit,
