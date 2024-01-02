@@ -9,6 +9,7 @@ app.get("/health", (_req, res) => {
     health: "ok",
     message: "request for data",
   });
-});
+}); 
+
 
 module.exports = app;

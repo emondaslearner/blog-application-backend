@@ -528,6 +528,8 @@ paths:
       tags:
         - comment
       operationId: "CreateComment"
+      security:
+        - bearerAuth: []
       requestBody:
         description: "You have to pass those field to do comment on a post"
         content:
@@ -538,6 +540,9 @@ paths:
                 body:
                   type: string
                   example: "Nice"
+                articleId:
+                  type: string
+                  example: "6583d7af8d8f9b8d2ecad6e4"
       responses:
         201:
           description: "Success message"

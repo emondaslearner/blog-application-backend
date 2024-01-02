@@ -24,6 +24,15 @@ const middlewares = (app) => {
   app.use(cookieParser());
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   app.use(router);
+  
+  app.use((err, _req, res, next) => {
+    // TODO: format error
+    console.log('error', err.message)
+    res.status(err.status || 500).json({
+      message: err.message,
+      errors: err.errors,
+    });
+  });
 };
 
 module.exports = middlewares;

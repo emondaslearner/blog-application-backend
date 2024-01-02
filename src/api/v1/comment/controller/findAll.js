@@ -1,19 +1,7 @@
-const {
-  findAllItem: findAllArticle,
-  countArticles,
-} = require("../../../../lib/article");
+const { countComments, findAllComments } = require("../../../../lib/comment");
 const { query } = require("../../../../utils");
 
-/**
- * Retrieve a paginated list of articles based on query parameters.
- *
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @param {function} next - Express next function.
- * @throws {Error} - Throws an error if there is an issue during data retrieval.
- * @returns {void}
- */
-const findAll = async (req, res, next) => {
+const getAllComments = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -21,7 +9,7 @@ const findAll = async (req, res, next) => {
     const sortBy = req.query.sortBy || "updatedAt";
     const search = req.query.search || "";
 
-    const articles = await findAllArticle({
+    const comments = await findAllComments({
       page,
       limit,
       sortType,
@@ -30,13 +18,13 @@ const findAll = async (req, res, next) => {
     });
 
     const mainData = await query.transformData({
-      items: articles,
-      selections: ['title', 'content', 'id', 'author', 'status', 'updatedAt'],
-      path: "/articles",
+      items: comments,
+      selections: ['article', 'id', 'body', 'status', 'updatedAt', 'author'],
+      path: "/comments",
     });
 
     // pagination
-    const totalArticle = await countArticles({ search: search });
+    const totalArticle = await countComments({ search: search });
     const pagination = await query.getPagination({
       totalItems: totalArticle,
       limit,
@@ -58,7 +46,7 @@ const findAll = async (req, res, next) => {
 
     const response = {
       code: 200,
-      message: "Data fetched successfully",
+      message: "Fetched comments successfully",
       data: mainData,
       self: req.url,
       links: hateoas,
@@ -66,9 +54,9 @@ const findAll = async (req, res, next) => {
     };
 
     res.status(200).json(response);
-  } catch (err) {
-    next(err);
+  } catch (e) {
+    next(e);
   }
 };
 
-module.exports = findAll;
+module.exports = getAllComments;
