@@ -304,6 +304,8 @@ paths:
       tags:
         - article
       operationId: "DeletePost"
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/pathId"
       responses:
@@ -342,6 +344,8 @@ paths:
       tags:
         - article
       operationId: "updatePost"
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/pathId"
         - in: formData
@@ -408,6 +412,8 @@ paths:
       tags:
         - article
       operationId: "updatePostPatch"
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/pathId"
         - in: formData
@@ -1440,6 +1446,6 @@ components:
       name: id
       schema:
         type: string
-      default: '1'
+      default: '6583d7af8d8f9b8d2ecad6e4'
       required: true
       description: "Pass resource id"

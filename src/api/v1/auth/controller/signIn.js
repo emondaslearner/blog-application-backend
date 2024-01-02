@@ -27,7 +27,7 @@ const signInUser = async (req, res, next) => {
       links: {
         articles:
           "/articles?sortType=des&sortBy=updatedAt&limit=100&page=1&expand=comment",
-        user: `/user/${responseData?.token}`,
+        user: `/user/${responseData?.id}`,
       },
     };
 

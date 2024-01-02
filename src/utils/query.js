@@ -17,7 +17,7 @@ const transformData = async ({ items = [], selections = [], path = "/" }) => {
   }
 
   if (selections.length === 0) {
-    return items.map((data) => ({ ...data, link: `/${path}/${data?.id}` }));
+    return items.map((data) => ({ ...data, link: `${path}/${data?.id}` }));
   }
 
   return items.map((data) => {
@@ -27,7 +27,7 @@ const transformData = async ({ items = [], selections = [], path = "/" }) => {
       result[key] = data[key];
     });
 
-    result.link = `/${path}/${data.id}`;
+    result.link = `${path}/${data.id}`;
 
     return result;
   });
